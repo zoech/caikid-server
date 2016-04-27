@@ -1,6 +1,6 @@
 
 all:
-	cd src-lib && make module
+	cd src-lib && make deploy
 	cd WEB-INF/classes && make
 
 clean:
