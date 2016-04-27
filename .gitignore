@@ -1,0 +1,4 @@
+*.class
+*index.html*
+*.jar
+build/

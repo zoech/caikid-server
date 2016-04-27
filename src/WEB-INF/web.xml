@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app>
+
+  <description>
+    test
+  </description>
+
+  <display-name> test </display-name>
+
+  <servlet>
+    <servlet-name>LoginServlet</servlet-name>
+	<servlet-class>LoginServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>VerifyServlet</servlet-name>
+	<servlet-class>VerifyServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>TestCookieServlet</servlet-name>
+	<servlet-class>TestCookieServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>LoginServlet</servlet-name>
+	<url-pattern>/user/login</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>VerifyServlet</servlet-name>
+	<url-pattern>/user/verify</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>TestCookieServlet</servlet-name>
+	<url-pattern>/test/cookietest</url-pattern>
+  </servlet-mapping>
+
+ </web-app>
