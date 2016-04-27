@@ -26,4 +26,4 @@ copy: User.class
 	
 
 %.class:%.java
-	javac -classpath $(CLASSPATH):$(EXCLASSPATH) $^
+	javac -classpath $(CLASSPATH):$(EXCLASSPATH):$(TOMCATLIBPATH) $^

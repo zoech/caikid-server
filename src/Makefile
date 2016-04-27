@@ -1,8 +1,10 @@
+src=src-lib
+classdir=WEB-INF/classes
 
 all:
-	cd src-lib && make deploy
-	cd WEB-INF/classes && make
+	cd $(src) && make deploy
+	cd $(classdir) && make
 
 clean:
-	cd WEB-INF/classes && make clean
-	cd src-lib/ && make clean
+	cd $(classdir) make clean
+	cd $(src) && make clean

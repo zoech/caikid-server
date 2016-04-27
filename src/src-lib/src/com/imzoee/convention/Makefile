@@ -1,5 +1,5 @@
 
-EXCLASSPATH=/home/pi/WEB-LIB/fastjson-1.2.8.jar
+#EXCLASSPATH=/home/pi/WEB-LIB/fastjson-1.2.8.jar
 
 SRCROOT=../../..
 BUILDROOT=../../../../build
@@ -30,4 +30,4 @@ clean-buildir:
 	
 
 %.class:%.java
-	javac -classpath $(CLASSPATH):$(EXCLASSPATH) $^
+	javac -classpath $(CLASSPATH):$(EXCLASSPATH):$(TOMCATLIBPATH) $^

@@ -9,4 +9,4 @@ clean:
 	rm -rf *.class
 
 %.class: %.java
-	javac -classpath $(CLASSPATH):$(EXCLASSPATH) $^
+	javac -classpath $(TOMCATLIBPATH):$(EXCLASSPATH) $^
