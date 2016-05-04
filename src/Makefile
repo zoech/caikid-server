@@ -6,5 +6,5 @@ all:
 	cd $(classdir) && make
 
 clean:
-	cd $(classdir) make clean
+	cd $(classdir) && make clean
 	cd $(src) && make clean

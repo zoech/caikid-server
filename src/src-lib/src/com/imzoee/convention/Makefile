@@ -20,8 +20,10 @@ clean:
 	rm -rf *.class
 	rm -rf *.jar
 
-copy: ConstConv.class VerifyConv.class SignupConv.class LoginConv.class LogoutConv.class \
+#copy: ConstConv.class VerifyConv.class SignupConv.class LoginConv.class LogoutConv.class \
 		UserInfoConv.class PostUserConv.class
+
+copy: ConstConv.class
 	mkdir -p $(BUILDROOT)/$(ARCHIEVE)
 	cp $^ $(BUILDROOT)/$(ARCHIEVE)
 

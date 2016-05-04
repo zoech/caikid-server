@@ -10,36 +10,28 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSON;
 
 import com.imzoee.model.User;
-import com.imzoee.convention.LoginConv;
 import com.imzoee.convention.ConstConv;
 
 
 public class LoginServlet extends HttpServlet {
-  //private static final long serialVersionUID = 1L;
-
-/*
-  public static void main(String[] args){
-    
-	Foo foo = new Foo();
-	foo.setId(1);
-	foo.setName("zoey");
-
-	String jsonStr = JSON.toJSONString(foo);
-
-	System.out.println(jsonStr);
-  }
-*/
+	
+  private static final String KEY_SESSION_MODE = "session-key";
+  private static final String LOGIN_MODE = "mode-login";
+  private static final int STATUS_USERNOTEXIT = -1;
+  private static final int STATUS_PWDERR = -2;
+  
+  
+  private User lgUser = null;
 
   @Override
   public void doGet(HttpServletRequest request,
                    HttpServletResponse response)
 			throws IOException, ServletException
   {
-
+/*
     PrintWriter out = response.getWriter();
 
 	response.addHeader("Content-Type", "application/json;charset=UTF-8");
@@ -52,7 +44,7 @@ public class LoginServlet extends HttpServlet {
 	obj.put("credit",1000000);
 
 	String jsonStr = JSON.toJSONString(obj);
-/*
+
 	out.println("<html>");
 	out.println("<head>");
 	out.println("<title>example</title>");
@@ -62,9 +54,9 @@ public class LoginServlet extends HttpServlet {
 	out.println("<p>" + jsonStr + "</p>");
 	out.println("</body>");
 	out.println("</html>");
-*/
 
-    out.print(jsonStr);
+
+    out.print(jsonStr);*/
   }
 
   @Override
@@ -73,51 +65,89 @@ public class LoginServlet extends HttpServlet {
 			throws IOException, ServletException
   {
 
-    User user1 = new User(100,"zoey@imzoee.com","abababab","zoey",10);
-    User user2 = new User(101,"jack@imzoee.com","2b2b2b2b","jack",1000);
-    User user3 = new User(110,"user@imuser.com","2b2b2b2b","user",500);
+   
+	
+	//response.addHeader("Content-Type", "application/json;charset=UTF-8");
+
+	String account = request.getParameter(ConstConv.RESKEY_ACCOUNT);
+	String pwd = request.getParameter(ConstConv.RESKEY_PWD);
+	
+	if(account == null){
+		response.setHeader(ConstConv.HEADKEY_RESPONSTATUS, ConstConv.RET_STATUS_ACCOUNTNULL);
+		return;
+	}
+	
+	if(pwd == null){
+		response.setHeader(ConstConv.HEADKEY_RESPONSTATUS, ConstConv.RET_STATUS_PWDNULL);
+		return;
+	}
+
+	int loginId = login(account, pwd);
+	  
+	if(loginId > 0){
+		response.setHeader(ConstConv.HEADKEY_RESPONSTATUS, ConstConv.RET_STATUS_OK);
+		response.setIntHeader(ConstConv.RESKEY_ID, loginId);
+		
+		HttpSession s = request.getSession();
+		if(!s.isNew()){
+			s.invalidate();
+			s = request.getSession();
+		}
+		
+		response.setHeader(ConstConv.HEADKEY_RESPONSTATUS, ConstConv.RET_STATUS_OK);
+		
+		s.setAttribute(ConstConv.RESKEY_ID, loginId);
+		s.setMaxInactiveInterval(0);
+	} else {
+
+		lgUser = null;
+		switch (loginId){
+			case STATUS_USERNOTEXIT:
+				response.setHeader(ConstConv.HEADKEY_RESPONSTATUS, ConstConv.RET_STATUS_USERNOTEXIST);
+				break;
+				
+			case STATUS_PWDERR:
+				response.setHeader(ConstConv.HEADKEY_RESPONSTATUS, ConstConv.RET_STATUS_PWDERR);
+				break;
+				
+			default:
+				break;
+		}
+	}
+	
+	PrintWriter out = response.getWriter();
+	String outStr = JSON.toJSONString(lgUser);
+	out.print(outStr);
+	
+  }
+  
+  private int login(String account, String pwd){
+	User user1 = new User(100,"zoey@imzoee.com","ab","zoey",10,"http://110.64.86.208:8080/caikid/eye_center.jpg");
+    User user2 = new User(101,"13660560275","ab","zoe",1000,"http://110.64.86.208:8080/caikid/eye_center.jpg");
+    User user3 = new User(110,"zoey","ab","zoe",100, "http://110.64.86.208:8080/caikid/eye_big.jpg");
 
     List<User> user = new ArrayList<User>();
     user.add(user1);
     user.add(user2);
     user.add(user3);
-
-	//HttpSession s = request.getSession();
-	//s.setMaxInactiveInterval(30);
-
-    PrintWriter out = response.getWriter();
-	response.addHeader("Content-Type", "application/json;charset=UTF-8");
-	//String ssId = request.getHeader(ConstConv.HEADKEY_SESSIONID);
-
-	String lgAccount = request.getParameter(LoginConv.RESKEY_ACCOUNT);
-	String lgPwd = request.getParameter(LoginConv.RESKEY_PWD);
-
-	String status = LoginConv.RET_STATUS_USERNOTEXIST;
-	String uName = "login error";
-
-	if(lgAccount != null && lgPwd != null){
-	  for (int i = 0; i < user.size(); ++i){
-	    if (lgAccount.equals(user.get(i).getAccount())){
-		  if (lgPwd.equals(user.get(i).getPwd())){
-		    status = LoginConv.RET_STATUS_OK;
-			uName = user.get(i).getName();
+	
+	for (int i = 0; i < user.size(); ++i){
+	    if (account.equals(user.get(i).getAccount())){
+		  if (pwd.equals(user.get(i).getPwd())){
+			lgUser = user.get(i);
+			return user.get(i).getId();
 		  } else{
-		    status = LoginConv.RET_STATUS_PWDERR;
+		    return STATUS_PWDERR;
 		  }
 		}
-	  }
 	}
-
-    JSONObject resObj = new JSONObject();
-	resObj.put(LoginConv.RSPKEY_STATUS,status);
-	resObj.put(LoginConv.RESKEY_ACCOUNT, uName);
-	//resObj.put(ConstConv.HEADKEY_SESSIONID, ssId);
-//	String jsonStr = JSON.toJSONString(foo);
-    String resStr = JSON.toJSONString(resObj);
-
-
-	out.println(resStr);
-
+	
+	return STATUS_USERNOTEXIT;
+  }
+  
+  /* notify the old login device, tell it its account relogin in new device, and force it logout */
+  private void closeOldSession(HttpSession s){
+	  
   }
 
 }

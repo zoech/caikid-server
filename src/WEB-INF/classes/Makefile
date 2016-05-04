@@ -1,7 +1,7 @@
+CAIKID_LIB=../lib/caikid-lib.jar
+EXCLASS=/home/pi/WEB-LIB/fastjson-1.2.8.jar:$(CAIKID_LIB)
 
-EXCLASSPATH=/home/pi/WEB-LIB/fastjson-1.2.8.jar:../lib/caikid-lib.jar
-
-all: VerifyServlet.class
+all: VerifyServlet.class SignupServlet.class LoginServlet.class LogoutServlet.class
 
 test: TestCookieServlet.class
 
@@ -9,4 +9,4 @@ clean:
 	rm -rf *.class
 
 %.class: %.java
-	javac -classpath $(TOMCATLIBPATH):$(EXCLASSPATH) $^
+	javac -classpath $(TOMCATLIBPATH):$(EXCLASS) $<

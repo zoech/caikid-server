@@ -15,8 +15,6 @@ import com.alibaba.fastjson.JSON;
 
 import com.imzoee.model.User;
 import com.imzoee.convention.ConstConv;
-import com.imzoee.convention.VerifyConv;
-import com.imzoee.convention.SignupConv;
 
 
 public class VerifyServlet extends HttpServlet {
@@ -26,67 +24,26 @@ public class VerifyServlet extends HttpServlet {
                    HttpServletResponse response)
 			throws IOException, ServletException
   {
-	//HttpSession s = request.getSession();
-	//s.setMaxInactiveInterval(30);
 	
-	String account = request.getParameter(VerifyConv.RESKEY_ACCOUNT);
-	String pwd = request.getParameter(VerifyConv.RESKEY_PWD);
-	String name = request.getParameter(VerifyConv.RESKEY_NAME);
+	String account = request.getParameter(ConstConv.RESKEY_ACCOUNT);
 	
 	
-	/*
-	 * check if any of these query parameter is null, and set the result coressponding
-	 */
-	boolean partialErr = false;
 	if (account == null){
-	  addResponseStatus(response, VerifyConv.RET_STATUS_ACCOUNTNULL);
-	  partialErr = true;
-	}
-	if (pwd == null){
-	  addResponseStatus(response, VerifyConv.RET_STATUS_PWDNULL);
-	  partialErr = true;
-	}
-	if (name == null){
-	  addResponseStatus(response, VerifyConv.RET_STATUS_NAMENULL);
-	  partialErr = true;
-	}
-	if (partialErr){
+	  response.setHeader(ConstConv.HEADKEY_RESPONSTATUS, 
+						ConstConv.RET_STATUS_ACCOUNTNULL);
 	  return;
 	}
 	
-	
-	/* check if the account, name, pwd is valid */
+	/* check if the account is valid */
 	if (!isAccountValid(account)){
-	  addResponseStatus(response, VerifyConv.RET_STATUS_ACCOUNTINVALID);
-	  partialErr = true;
-	} else {
-	  if(isAccountUsed(account)) {
-		addResponseStatus(response, VerifyConv.RET_STATUS_ACCOUNTREGED);
-		partialErr = true;
-	  }
-	}
-	
-	if (!isNameValid(name)){
-	  addResponseStatus(response, VerifyConv.RET_STATUS_NAMEINVALID);
-	  partialErr = true;
-	} else {
-	  if(isNameUsed(name)) {
-		addResponseStatus(response, VerifyConv.RET_STATUS_NAMEUSED);
-		partialErr = true;
-	  }
-	}
-	
-	if (!isPwdValid(pwd)){
-	  addResponseStatus(response, VerifyConv.RET_STATUS_PWDFOMATERR);
-	  partialErr = true;
-	}
-
-	if (partialErr){
+	  response.setHeader(ConstConv.HEADKEY_RESPONSTATUS, 
+						ConstConv.RET_STATUS_ACCOUNTINVALID);
+	  return;
+	} else if(isAccountUsed(account)) {
+	  response.setHeader(ConstConv.HEADKEY_RESPONSTATUS, 
+						ConstConv.RET_STATUS_ACCOUNTREGED);
 	  return;
 	}
-	
-	
-	
 
 	/* 
 	 * if the servlet run arrived here, that means all the 
@@ -109,19 +66,20 @@ public class VerifyServlet extends HttpServlet {
 	
 	/* create session */
 	HttpSession s = request.getSession();
+	if(!s.isNew()){
+	  s.invalidate();
+	  s = request.getSession();
+	}
 	/* set this session inactive interval */
-	s.setMaxInactiveInterval(2*60); // for temporary test,we set it to 2*60, 2 minutes
+	s.setMaxInactiveInterval(20*60); // for temporary test,we set it to 20*60, 20 minutes
 	
-	/* associate the verify code with the session */
-	s.setAttribute(SignupConv.RESKEY_VERIFYCODE, verifyCode);
+	/* associate the verify code and the user's account,pwd,name, etc with the session */
+	s.setAttribute(ConstConv.RESKEY_VERIFYCODE, verifyCode);
+	s.setAttribute(ConstConv.RESKEY_ACCOUNT, account);
 
 	/* and dont forget to set the ok status in the header line */
-	response.setHeader(ConstConv.HEADKEY_RESPONSTATUS, VerifyConv.RET_STATUS_OK);
+	response.setHeader(ConstConv.HEADKEY_RESPONSTATUS, ConstConv.RET_STATUS_OK);
 
-  }
-  
-  private static void addResponseStatus(HttpServletResponse response, String status){
-	  response.addHeader(ConstConv.HEADKEY_RESPONSTATUS, status);
   }
   
   /*
@@ -136,27 +94,6 @@ public class VerifyServlet extends HttpServlet {
    */
   private static boolean isAccountUsed(String account) {
 	  return false;
-  }
-  
-  /*
-   * going to be completed, check if the name is an valid string;
-   */
-  private static boolean isNameValid(String name){
-	return true; // currently we set this to true, because we now dont know how to check the phone num is valid;
-  }
-  
-  /*
-   * going to be completed, check if the name is already used by another user;
-   */
-  private static boolean isNameUsed(String name) {
-	  return false;
-  }
-  
-  /*
-   * going to be completed, check if the pwd is in right format;
-   */
-  private static boolean isPwdValid(String pwd){
-	return true; // currently we set this to true, because we now dont know how to check the phone num is valid;
   }
   
   private static String generateVerifyCode(){

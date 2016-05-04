@@ -9,6 +9,9 @@ public class SignupConv {
      * RST, result
      */
     public static final String RET_STATUS_OK = "ok";
+	public static final String RET_STATUS_VERIFYERR = "verify-unmatch";
+	public static final String RET_STATUS_TIMEOUT = "verifyCode-timeout";
+	public static final String RET_STATUS_NOTSIGNUPSESSION = "not-signup-session";
     public static final String RET_STATUS_ACCOUNTREGED = "account-registered";
     public static final String RET_STATUS_NAMEUSED = "name-used";
     public static final String RET_STATUS_PWD2SHORT = "pwd-too-short";
